@@ -29,6 +29,10 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.45}
 body{min-height:100%;overscroll-behavior-y:none}
+/* iOS home-screen apps pin fixed bars to a too-short viewport when the page is shorter
+   than the screen. Keeping the page at least screen height avoids it. */
+@media (display-mode: standalone){body{min-height:100vh}}
+.standalone body{min-height:100vh}
 button{font:inherit;color:inherit;cursor:pointer}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--grass);outline-offset:2px}
 [hidden]{display:none!important}
@@ -598,6 +602,7 @@ function startScan(url){
 $('again').onclick=()=>{clearInterval(scanTimer);setStage('idle')};
 
 /* ================= Boot ================= */
+if(navigator.standalone===true) document.documentElement.classList.add('standalone');
 renderM(); renderCounts(); setStage('idle');
 showView(store.get('bbict-tab')||'molkky');
 if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
