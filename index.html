@@ -22,6 +22,7 @@
   --grass:#5fbf80; --grass-ink:#08140c;
   --birch:#f1e2c4; --birch-edge:#c9ad7c; --birch-ink:#33260f;
   --blaze:#ff5c28; --blaze-ink:#1a0700; --gold:#f2c14e; --warn:#ff8a50;
+  --xp:#8e44c9; --xp-glow:#c99af0;
   --display:ui-rounded,"SF Pro Rounded",-apple-system,system-ui,"Segoe UI",sans-serif;
   --body:-apple-system,system-ui,"Segoe UI",Roboto,sans-serif;
   --tabh:62px;
@@ -62,7 +63,7 @@ h2{font-family:var(--display);font-weight:800;font-size:13px;letter-spacing:.08e
 
 /* Tabs */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-.tabs-in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--tabh)}
+.tabs-in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);height:var(--tabh)}
 .tab{background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--muted);font-size:12px;font-weight:700}
 .tab svg{width:26px;height:26px}
 .tab[aria-selected="true"]{color:var(--fg)}
@@ -160,6 +161,24 @@ label.opt select{font:inherit;font-size:16px;font-weight:400;padding:10px;border
 .shutter:active{background:#fff}
 .camclose{position:absolute;top:10px;right:10px;background:rgba(5,8,6,.6);border:none;color:#fff;border-radius:999px;padding:6px 12px;font-weight:700;font-size:14px}
 .fine{font-size:13px;color:var(--muted);margin:0}
+
+/* ---------- XP ---------- */
+.xp-card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:24px 18px 20px;display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden}
+.xp-label{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.xp-num{font-family:var(--display);font-weight:900;font-size:clamp(40px,13vw,60px);line-height:1;font-variant-numeric:tabular-nums;color:var(--xp-glow);word-break:break-all}
+.xp-num small{font-size:.4em;color:var(--muted);font-weight:800;margin-left:6px}
+.xp-level{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-weight:800;font-variant-numeric:tabular-nums}
+.xp-level .lvl{font-family:var(--display);font-size:22px}
+.xp-level .frac{font-size:13px;color:var(--muted);text-align:right}
+.xpbar{height:18px;border-radius:4px;background:#0b0f0c;border:2px solid #3a3226;position:relative;overflow:hidden}
+.xpbar b{position:absolute;inset:0 auto 0 0;background:linear-gradient(#b77be8,var(--xp) 55%,#5a2a86);transition:width .25s linear}
+.xpbar i{position:absolute;top:0;bottom:0;width:2px;background:#3a3226;opacity:.9}
+.xp-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.xp-stat{background:var(--raise);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.xp-stat span{font-size:12px;color:var(--muted);font-weight:700}
+.xp-stat b{font-family:var(--display);font-size:18px;font-variant-numeric:tabular-nums}
+.levelup{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:40px;color:var(--gold);text-shadow:0 2px 12px rgba(0,0,0,.6);background:rgba(16,26,19,.6);pointer-events:none;animation:lvlup 2.2s ease-out forwards}
+@keyframes lvlup{0%{opacity:0;transform:scale(.6)}15%{opacity:1;transform:scale(1.08)}25%{transform:scale(1)}80%{opacity:1}100%{opacity:0}}
 
 /* ---------- Info ---------- */
 .info-card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:36px 24px;text-align:center}
@@ -278,6 +297,24 @@ label.opt select{font:inherit;font-size:16px;font-weight:400;padding:10px;border
     </div>
   </section>
 
+  <!-- ======== XP ======== -->
+  <section class="view" id="v-xp" hidden>
+    <h2>WoW XP earned while looking at this app</h2>
+    <div class="xp-card" id="xpCard">
+      <div>
+        <div class="xp-label">Total experience</div>
+        <div class="xp-num" id="xpNum">0<small>XP</small></div>
+      </div>
+      <div class="xp-level"><span class="lvl" id="xpLvl">Level 1</span><span class="frac" id="xpFrac"></span></div>
+      <div class="xpbar" id="xpBar"><b id="xpFill"></b></div>
+      <div class="xp-stats">
+        <div class="xp-stat"><span>Time in the app</span><b id="xpTime">0s</b></div>
+        <div class="xp-stat"><span>Next level in</span><b id="xpEta">—</b></div>
+      </div>
+    </div>
+    <p class="fine">Based on the average WoW Classic player: 4,084,700 XP from level 1 to 60 over about 10 days of /played, or about 17,020 XP an hour. Counts whenever BBICT is open on screen, on any tab, and keeps adding up.</p>
+  </section>
+
   <!-- ======== Info ======== -->
   <section class="view" id="v-info" hidden>
     <h2>Info</h2>
@@ -293,11 +330,15 @@ label.opt select{font:inherit;font-size:16px;font-weight:400;padding:10px;border
     </button>
     <button class="tab" role="tab" data-view="bangers" aria-selected="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10v4h4l6 5V5L7 10H3Z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19.5 5.5a9 9 0 0 1 0 13"/></svg>
-      Banger alerts
+      Bangers
     </button>
     <button class="tab" role="tab" data-view="newt" aria-selected="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M3 12h18"/></svg>
       Newt scan
+    </button>
+    <button class="tab" role="tab" data-view="xp" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5l2.6 5.6 6 .7-4.5 4.1 1.2 6-5.3-3-5.3 3 1.2-6L3.4 8.8l6-.7Z"/></svg>
+      XP
     </button>
     <button class="tab" role="tab" data-view="info" aria-selected="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6"/><circle cx="12" cy="7.5" r=".6" fill="currentColor"/></svg>
@@ -347,7 +388,7 @@ const $=id=>document.getElementById(id);
 const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 
 /* ================= Tabs ================= */
-const TITLES={molkky:'Mölkky',bangers:'Banger alerts',newt:'Newt scan',info:'Info'};
+const TITLES={molkky:'Mölkky',bangers:'Banger alerts',newt:'Newt scan',xp:'WoW XP',info:'Info'};
 function showView(name){
   if(!TITLES[name]) name='molkky';
   document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.view===name));
@@ -613,6 +654,58 @@ function startScan(url){
   },120);
 }
 $('again').onclick=()=>{clearInterval(scanTimer);setStage('idle')};
+
+/* ================= WoW XP ================= */
+// Average WoW Classic player: 4,084,700 XP for levels 1-60 over ~10 days (240 h) of /played.
+const XP_PER_SEC=4084700/(240*3600);
+// XP needed to go from level n to n+1 in WoW Classic (index 0 = level 1 to 2).
+const XP_TABLE=[400,900,1400,2100,2800,3600,4500,5400,6500,7600,8800,10100,11400,12900,14400,16000,17700,19400,21300,23200,25200,27300,29400,31700,34000,36400,38900,41400,44300,47400,50800,54500,58600,62800,67100,71600,76100,80800,85700,90700,95800,101000,106300,111800,117500,123200,129100,135100,141200,147500,153900,160400,167100,173900,180800,187900,195000,202300,209800];
+const XKEY='bbict-xp-seconds';
+let xpSecs=+(store.get(XKEY)||0), xpLast=performance.now(), xpSaved=performance.now(), xpLevelShown=0;
+const fmtInt=n=>Math.floor(n).toLocaleString('en-US');
+function fmtDur(s){
+  s=Math.floor(s); const d=Math.floor(s/86400), h=Math.floor(s%86400/3600), m=Math.floor(s%3600/60), x=s%60;
+  if(d) return `${d}d ${h}h ${m}m`; if(h) return `${h}h ${m}m ${x}s`; if(m) return `${m}m ${x}s`; return `${x}s`;
+}
+function levelFor(xp){
+  let lvl=1, rem=xp;
+  for(const need of XP_TABLE){ if(rem<need) return {lvl,into:rem,need}; rem-=need; lvl++; }
+  return {lvl:60,into:rem,need:0};
+}
+// build the 20 bubble dividers once, like the in-game bar
+(()=>{const bar=$('xpBar');for(let i=1;i<20;i++){const d=document.createElement('i');d.style.left=(i*5)+'%';bar.appendChild(d)}})();
+function xpTick(){
+  const now=performance.now();
+  if(document.visibilityState==='visible'){
+    const dt=(now-xpLast)/1000;
+    if(dt>0&&dt<5) xpSecs+=dt;           // ignore big jumps (phone asleep, app suspended)
+  }
+  xpLast=now;
+  if(now-xpSaved>2000){store.set(XKEY,xpSecs);xpSaved=now}
+  if($('v-xp').hidden) return;
+  const xp=xpSecs*XP_PER_SEC, L=levelFor(xp);
+  $('xpNum').firstChild.nodeValue=fmtInt(xp);
+  $('xpTime').textContent=fmtDur(xpSecs);
+  if(L.need){
+    $('xpLvl').textContent='Level '+L.lvl;
+    $('xpFrac').textContent=fmtInt(L.into)+' / '+fmtInt(L.need);
+    $('xpFill').style.width=(L.into/L.need*100).toFixed(2)+'%';
+    $('xpEta').textContent=fmtDur((L.need-L.into)/XP_PER_SEC);
+  } else {
+    $('xpLvl').textContent='Level 60';
+    $('xpFrac').textContent='Max level';
+    $('xpFill').style.width='100%';
+    $('xpEta').textContent='Maxed out';
+  }
+  if(xpLevelShown&&L.lvl>xpLevelShown){
+    const f=document.createElement('div'); f.className='levelup'; f.textContent='LEVEL UP!';
+    $('xpCard').appendChild(f); setTimeout(()=>f.remove(),2300);
+  }
+  xpLevelShown=L.lvl;
+}
+setInterval(xpTick,200);
+document.addEventListener('visibilitychange',()=>{xpLast=performance.now();store.set(XKEY,xpSecs)});
+addEventListener('pagehide',()=>store.set(XKEY,xpSecs));
 
 /* ================= Boot ================= */
 if(navigator.standalone===true) document.documentElement.classList.add('standalone');
