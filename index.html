@@ -177,7 +177,30 @@ label.opt select{font:inherit;font-size:16px;font-weight:400;padding:10px;border
 .xp-stat{background:var(--raise);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
 .xp-stat span{font-size:12px;color:var(--muted);font-weight:700}
 .xp-stat b{font-family:var(--display);font-size:18px;font-variant-numeric:tabular-nums}
-.levelup{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:40px;color:var(--gold);text-shadow:0 2px 12px rgba(0,0,0,.6);background:rgba(16,26,19,.6);pointer-events:none;animation:lvlup 2.2s ease-out forwards}
+.xp-title{font-size:15px;font-weight:700;color:var(--xp-glow);margin-top:2px;text-wrap:balance}
+.levelup{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px;text-align:center;background:rgba(16,26,19,.88);pointer-events:none;animation:lvlup 3s ease-out forwards}
+.levelup b{font-family:var(--display);font-weight:900;font-size:40px;line-height:1;color:var(--gold);text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.levelup span{font-weight:800;font-size:18px;color:var(--fg);text-wrap:balance}
+.levelup em{font-style:normal;font-size:13px;font-weight:800;color:var(--blaze);text-transform:uppercase;letter-spacing:.08em}
+.lvl-list{display:flex;flex-direction:column;gap:8px}
+.lvl-item{display:grid;grid-template-columns:48px 1fr;gap:4px 12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.lvl-item .badge{grid-row:span 2;width:48px;height:48px;border-radius:12px;background:var(--raise);display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:20px;color:var(--xp-glow);font-variant-numeric:tabular-nums}
+.lvl-item .t{font-weight:800;min-width:0;text-wrap:balance}
+.lvl-item .s{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.lvl-item.now{border:2px solid var(--xp);background:color-mix(in srgb,var(--xp) 12%,var(--surface))}
+.lvl-item.now .s{color:var(--xp-glow)}
+.lvl-item.next{border-style:dashed;opacity:.75}
+.lvl-item.next .badge{color:var(--muted)}
+.lvl-item.max .badge{background:var(--gold);color:#1e1600}
+.chal{grid-column:1/-1;margin-top:8px;display:flex;align-items:center;gap:10px;background:rgba(242,193,78,.1);border:1px dashed var(--gold);border-radius:10px;padding:9px 10px}
+.chal .ct{flex:1;min-width:0;font-size:14px;font-weight:700}
+.chal .ct small{display:block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
+.chal button{flex:none;border:1px solid var(--gold);background:none;color:var(--gold);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:800}
+.chal.done{background:rgba(95,191,128,.12);border-color:var(--grass)}
+.chal.done .ct{text-decoration:line-through;opacity:.7}
+.chal.done small{color:var(--grass)}
+.chal.done button{border-color:var(--grass);background:var(--grass);color:var(--grass-ink)}
+.chal-tally{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);font-weight:700}
 @keyframes lvlup{0%{opacity:0;transform:scale(.6)}15%{opacity:1;transform:scale(1.08)}25%{transform:scale(1)}80%{opacity:1}100%{opacity:0}}
 
 /* ---------- Wind ---------- */
@@ -325,20 +348,24 @@ label.opt select{font:inherit;font-size:16px;font-weight:400;padding:10px;border
 
   <!-- ======== XP ======== -->
   <section class="view" id="v-xp" hidden>
-    <h2>WoW XP earned while looking at this app</h2>
+    <h2>BBICT XP</h2>
     <div class="xp-card" id="xpCard">
       <div>
         <div class="xp-label">Total experience</div>
         <div class="xp-num" id="xpNum">0<small>XP</small></div>
       </div>
-      <div class="xp-level"><span class="lvl" id="xpLvl">Level 1</span><span class="frac" id="xpFrac"></span></div>
+      <div>
+        <div class="xp-level"><span class="lvl" id="xpLvl">Level 1</span><span class="frac" id="xpFrac"></span></div>
+        <div class="xp-title" id="xpTitle"></div>
+      </div>
       <div class="xpbar" id="xpBar"><b id="xpFill"></b></div>
       <div class="xp-stats">
         <div class="xp-stat"><span>Time in the app</span><b id="xpTime">0s</b></div>
         <div class="xp-stat"><span>Next level in</span><b id="xpEta">—</b></div>
       </div>
     </div>
-    <p class="fine">Based on the average WoW Classic player: 4,084,700 XP from level 1 to 60 over about 10 days of /played, or about 17,020 XP an hour. Counts whenever BBICT is open on screen, on any tab, and keeps adding up.</p>
+    <p class="fine">Level 1 to 60 takes three straight days of looking at this app. It counts on every tab and keeps adding up. Every 5th level comes with a challenge.</p>
+    <div class="lvl-list" id="lvlList"></div>
   </section>
 
   <!-- ======== Wind ======== -->
@@ -448,7 +475,7 @@ const $=id=>document.getElementById(id);
 const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 
 /* ================= Tabs ================= */
-const TITLES={molkky:'Mölkky',bangers:'Banger alerts',newt:'Newt scan',xp:'WoW XP',wind:'Burn check',info:'Info'};
+const TITLES={molkky:'Mölkky',bangers:'Banger alerts',newt:'Newt scan',xp:'BBICT XP',wind:'Burn check',info:'Info'};
 function showView(name){
   if(!TITLES[name]) name='molkky';
   document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.view===name));
@@ -715,10 +742,72 @@ function startScan(url){
 }
 $('again').onclick=()=>{clearInterval(scanTimer);setStage('idle')};
 
-/* ================= WoW XP ================= */
-// Average WoW Classic player: 4,084,700 XP for levels 1-60 over ~10 days (240 h) of /played.
-const XP_PER_SEC=4084700/(240*3600);
-// XP needed to go from level n to n+1 in WoW Classic (index 0 = level 1 to 2).
+/* ================= BBICT XP ================= */
+// XP needed to go from level n to n+1 (index 0 = level 1 to 2). 4,084,700 XP total to reach 60.
+// Level 60 takes three days (72 hours) of looking at the app.
+const XP_PER_SEC=4084700/(72*3600);
+const LEVELS=[ // [title, challenge or null], index 0 = level 1
+  ['Fresh Off the Tailgate',null],
+  ['Forgot the Tent Stakes',null],
+  ['Cracked the First Cold One',null],
+  ['Cooler Jockey',null],
+  ['Pitched a Tent (Not That Kind)','Shotgun a beer. Everyone watches.'],
+  ['Sleeping Bag Zipper Enthusiast',null],
+  ['Lukewarm Natty Survivor',null],
+  ['Kindling Collector',null],
+  ['Asked “Who Brought the Ice?”',null],
+  ['Two-Man Tent, Three Men','Sleep in somebody else’s tent tonight. No questions.'],
+  ['Headlamp Hazard',null],
+  ['Busch Light Theologian',null],
+  ['Firestarter Wannabe',null],
+  ['Morning Wood (The Kindling Kind)',null],
+  ['Professional Log Handler','Carry the biggest log you can find back to camp. Alone.'],
+  ['Got Too Close to the Fire',null],
+  ['Koozie Collector',null],
+  ['Bear Bait',null],
+  ['Spoons for Warmth',null],
+  ['Beer Pong Field Medic','Win a game of beer pong with your off hand.'],
+  ['Moved the Truck for One Bar of Signal',null],
+  ['Banquet Beer Baron',null],
+  ['Unzipped the Wrong Tent',null],
+  ['Lost a Flip-Flop to the Fire',null],
+  ['Hot Dog Roasting Specialist','Cook a hot dog on a stick you found yourself. Eat it with no bun.'],
+  ['Would Share a Sleeping Bag If It Got Cold Enough',null],
+  ['Pee Tree Pioneer',null],
+  ['Has Seen Things in the Lake',null],
+  ['Mosquito Buffet',null],
+  ['Fireside Philosopher','Give a two-minute speech by the fire about your feelings. No interruptions.'],
+  ['Started Talking About His Dad',null],
+  ['The Guy Who Brought a Guitar',null],
+  ['Hammock Hog',null],
+  ['Handles Everyone’s Rod (Fishing)',null],
+  ['Sausage Party Planner','Wear someone else’s shirt for the rest of the night.'],
+  ['Beer Can Chicken Whisperer',null],
+  ['Woke Up in the Wrong Tent Again',null],
+  ['Packed a Second Cooler Just for Himself',null],
+  ['Fell Asleep Holding a Beer',null],
+  ['Lord of the Log Ride','Finish a beer before the Damn Son banger ends.'],
+  ['Skinny Dipping Captain',null],
+  ['Burned the Trash, Lost an Eyebrow',null],
+  ['Tent Pole Inspector',null],
+  ['Can’t Find His Pants',null],
+  ['Keg Stand Legend','Put on daisy dukes and do a full lap of the campsite.'],
+  ['Wears Daisy Dukes Unironically',null],
+  ['Gives Fireside Back Rubs',null],
+  ['Hasn’t Showered Since Thursday',null],
+  ['Drank the Lake Water',null],
+  ['King of Pitching','Win a game of Mölkky. Exactly 50 or it doesn’t count.'],
+  ['Woke Up Spooning the Cooler',null],
+  ['One with the Mosquitoes',null],
+  ['Can Tell Coors from Miller Blindfolded',null],
+  ['Cowboy Hat, No Shirt',null],
+  ['Ice Run Hero','Go get more ice. Sober driver only.'],
+  ['The Campfire’s Main Character',null],
+  ['Has Pitched Every Tent in the County',null],
+  ['Thirty-Rack Prophet',null],
+  ['One Beer Away From Enlightenment',null],
+  ['BBICT Legend','Burn the trash, but only if the Burn check says you can.']
+];
 const XP_TABLE=[400,900,1400,2100,2800,3600,4500,5400,6500,7600,8800,10100,11400,12900,14400,16000,17700,19400,21300,23200,25200,27300,29400,31700,34000,36400,38900,41400,44300,47400,50800,54500,58600,62800,67100,71600,76100,80800,85700,90700,95800,101000,106300,111800,117500,123200,129100,135100,141200,147500,153900,160400,167100,173900,180800,187900,195000,202300,209800];
 const XKEY='bbict-xp-seconds';
 let xpSecs=+(store.get(XKEY)||0), xpLast=performance.now(), xpSaved=performance.now(), xpLevelShown=0;
@@ -746,6 +835,8 @@ function xpTick(){
   const xp=xpSecs*XP_PER_SEC, L=levelFor(xp);
   $('xpNum').firstChild.nodeValue=fmtInt(xp);
   $('xpTime').textContent=fmtDur(xpSecs);
+  $('xpTitle').textContent=LEVELS[L.lvl-1][0];
+  if(L.lvl!==xpListLevel) renderLevels(L.lvl);
   if(L.need){
     $('xpLvl').textContent='Level '+L.lvl;
     $('xpFrac').textContent=fmtInt(L.into)+' / '+fmtInt(L.need);
@@ -758,10 +849,53 @@ function xpTick(){
     $('xpEta').textContent='Maxed out';
   }
   if(xpLevelShown&&L.lvl>xpLevelShown){
-    const f=document.createElement('div'); f.className='levelup'; f.textContent='LEVEL UP!';
-    $('xpCard').appendChild(f); setTimeout(()=>f.remove(),2300);
+    const [title,chal]=LEVELS[L.lvl-1];
+    const f=document.createElement('div'); f.className='levelup';
+    f.innerHTML='<b></b><span></span>'+(chal?'<em>New challenge unlocked</em>':'');
+    f.querySelector('b').textContent='LEVEL '+L.lvl;
+    f.querySelector('span').textContent=title;
+    $('xpCard').appendChild(f); setTimeout(()=>f.remove(),3100);
+    if(navigator.vibrate) navigator.vibrate(chal?[60,40,60,40,160]:60);
   }
   xpLevelShown=L.lvl;
+}
+
+// The stack of levels under the counter: the next one (title hidden), then every level reached, newest first.
+let xpListLevel=0;
+const chalDone=new Set(store.get('bbict-xp-done')||[]);
+function renderLevels(cur){
+  xpListLevel=cur;
+  const list=$('lvlList'); list.innerHTML='';
+  const total=LEVELS.filter(l=>l[1]).length, unlocked=LEVELS.slice(0,cur).filter(l=>l[1]).length;
+  const doneCount=LEVELS.slice(0,cur).filter((l,i)=>l[1]&&chalDone.has(i+1)).length;
+  const tally=document.createElement('div'); tally.className='chal-tally';
+  tally.innerHTML='<span>Your levels</span><span></span>';
+  tally.lastChild.textContent=`Challenges: ${doneCount} done · ${unlocked} of ${total} unlocked`;
+  list.appendChild(tally);
+  if(cur<60){
+    const n=document.createElement('div'); n.className='lvl-item next';
+    n.innerHTML=`<div class="badge">${cur+1}</div><div class="s">Up next</div><div class="t">???${LEVELS[cur][1]?' · challenge level':''}</div>`;
+    list.appendChild(n);
+  }
+  for(let lv=cur;lv>=1;lv--){
+    const [title,chal]=LEVELS[lv-1];
+    const d=document.createElement('div');
+    d.className='lvl-item'+(lv===cur?' now':'')+(lv===60?' max':'');
+    d.innerHTML=`<div class="badge">${lv}</div><div class="s">${lv===cur?'Current level':'Level '+lv}</div><div class="t"></div>`;
+    d.querySelector('.t').textContent=title;
+    if(chal){
+      const c=document.createElement('div'); const done=chalDone.has(lv);
+      c.className='chal'+(done?' done':'');
+      c.innerHTML='<div class="ct"><small></small><span></span></div><button type="button"></button>';
+      c.querySelector('small').textContent=done?'Challenge complete':'Challenge';
+      c.querySelector('.ct span').textContent=chal;
+      const b=c.querySelector('button'); b.textContent=done?'Done ✓':'Mark done';
+      b.setAttribute('aria-pressed',done);
+      b.onclick=()=>{chalDone.has(lv)?chalDone.delete(lv):chalDone.add(lv);store.set('bbict-xp-done',[...chalDone]);renderLevels(xpListLevel)};
+      d.appendChild(c);
+    }
+    list.appendChild(d);
+  }
 }
 setInterval(xpTick,200);
 document.addEventListener('visibilitychange',()=>{xpLast=performance.now();store.set(XKEY,xpSecs)});
