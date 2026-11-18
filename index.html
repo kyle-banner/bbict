@@ -63,8 +63,8 @@ h2{font-family:var(--display);font-weight:800;font-size:13px;letter-spacing:.08e
 
 /* Tabs */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-.tabs-in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);height:var(--tabh)}
-.tab{background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--muted);font-size:12px;font-weight:700}
+.tabs-in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr);height:var(--tabh)}
+.tab{background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--muted);font-size:11px;font-weight:700;white-space:nowrap;padding:0}
 .tab svg{width:26px;height:26px}
 .tab[aria-selected="true"]{color:var(--fg)}
 .tab[aria-selected="true"] svg{color:var(--blaze)}
@@ -179,6 +179,23 @@ label.opt select{font:inherit;font-size:16px;font-weight:400;padding:10px;border
 .xp-stat b{font-family:var(--display);font-size:18px;font-variant-numeric:tabular-nums}
 .levelup{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:40px;color:var(--gold);text-shadow:0 2px 12px rgba(0,0,0,.6);background:rgba(16,26,19,.6);pointer-events:none;animation:lvlup 2.2s ease-out forwards}
 @keyframes lvlup{0%{opacity:0;transform:scale(.6)}15%{opacity:1;transform:scale(1.08)}25%{transform:scale(1)}80%{opacity:1}100%{opacity:0}}
+
+/* ---------- Wind ---------- */
+.wind-card{background:var(--surface);border:1px solid var(--line);border-radius:22px;overflow:hidden;display:flex;flex-direction:column}
+.wind-sky{position:relative;height:120px;background:linear-gradient(180deg,#16271c,#101a13);overflow:hidden;border-bottom:4px solid var(--lvl,#5fbf80)}
+.wind-sky i{position:absolute;left:-40%;height:2px;border-radius:2px;background:rgba(238,243,236,.35);animation:gust linear infinite}
+@keyframes gust{from{transform:translateX(0)}to{transform:translateX(260%)}}
+.compass{position:absolute;right:16px;top:50%;width:76px;height:76px;margin-top:-38px;border-radius:50%;border:2px solid var(--line);background:rgba(16,26,19,.75);display:grid;place-items:center}
+.compass span{position:absolute;font-size:10px;font-weight:800;color:var(--muted)}
+.compass .n{top:3px}.compass .s{bottom:3px}.compass .e{right:5px}.compass .w{left:5px}
+.compass svg{width:46px;height:46px;transition:transform 1s cubic-bezier(.3,1.4,.5,1)}
+.wind-body{padding:20px 18px;display:flex;flex-direction:column;gap:16px}
+.burn-status{font-family:var(--display);font-weight:900;font-size:clamp(28px,8.4vw,38px);line-height:1.08;text-wrap:balance;color:var(--lvl,#5fbf80);margin:0}
+.burn-meter{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.burn-meter div{height:10px;border-radius:3px;background:var(--line)}
+.burn-meter-labels{display:flex;justify-content:space-between;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:6px}
+.wind-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.wind-foot{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
 
 /* ---------- Info ---------- */
 .info-card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:36px 24px;text-align:center}
@@ -315,6 +332,31 @@ label.opt select{font:inherit;font-size:16px;font-weight:400;padding:10px;border
     <p class="fine">Based on the average WoW Classic player: 4,084,700 XP from level 1 to 60 over about 10 days of /played, or about 17,020 XP an hour. Counts whenever BBICT is open on screen, on any tab, and keeps adding up.</p>
   </section>
 
+  <!-- ======== Wind ======== -->
+  <section class="view" id="v-wind" hidden>
+    <h2>Can we burn the trash?</h2>
+    <div class="wind-card" id="windCard">
+      <div class="wind-sky" id="windSky" aria-hidden="true">
+        <div class="compass"><span class="n">N</span><span class="e">E</span><span class="s">S</span><span class="w">W</span>
+          <svg viewBox="0 0 40 40" id="windArrow"><path d="M20 4l7 22-7-5-7 5Z" fill="var(--lvl,#5fbf80)"/><path d="M20 21v15" stroke="var(--lvl,#5fbf80)" stroke-width="3" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+      <div class="wind-body">
+        <p class="burn-status" id="burnStatus"></p>
+        <div>
+          <div class="burn-meter" id="burnMeter"><div></div><div></div><div></div><div></div><div></div></div>
+          <div class="burn-meter-labels"><span>No burn</span><span>Burn it all</span></div>
+        </div>
+        <div class="wind-stats">
+          <div class="xp-stat"><span>Wind</span><b id="windSpeed"></b></div>
+          <div class="xp-stat"><span>Gusts</span><b id="windGust"></b></div>
+          <div class="xp-stat"><span>From</span><b id="windDir"></b></div>
+        </div>
+        <div class="wind-foot"><span id="windUpdated"></span><span id="windNext"></span></div>
+      </div>
+    </div>
+  </section>
+
   <!-- ======== Info ======== -->
   <section class="view" id="v-info" hidden>
     <h2>Info</h2>
@@ -334,11 +376,15 @@ label.opt select{font:inherit;font-size:16px;font-weight:400;padding:10px;border
     </button>
     <button class="tab" role="tab" data-view="newt" aria-selected="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M3 12h18"/></svg>
-      Newt scan
+      Newt
     </button>
     <button class="tab" role="tab" data-view="xp" aria-selected="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5l2.6 5.6 6 .7-4.5 4.1 1.2 6-5.3-3-5.3 3 1.2-6L3.4 8.8l6-.7Z"/></svg>
       XP
+    </button>
+    <button class="tab" role="tab" data-view="wind" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h11a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h8"/></svg>
+      Wind
     </button>
     <button class="tab" role="tab" data-view="info" aria-selected="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6"/><circle cx="12" cy="7.5" r=".6" fill="currentColor"/></svg>
@@ -388,7 +434,7 @@ const $=id=>document.getElementById(id);
 const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 
 /* ================= Tabs ================= */
-const TITLES={molkky:'Mölkky',bangers:'Banger alerts',newt:'Newt scan',xp:'WoW XP',info:'Info'};
+const TITLES={molkky:'Mölkky',bangers:'Banger alerts',newt:'Newt scan',xp:'WoW XP',wind:'Burn check',info:'Info'};
 function showView(name){
   if(!TITLES[name]) name='molkky';
   document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.view===name));
@@ -706,6 +752,57 @@ function xpTick(){
 setInterval(xpTick,200);
 document.addEventListener('visibilitychange',()=>{xpLast=performance.now();store.set(XKEY,xpSecs)});
 addEventListener('pagehide',()=>store.set(XKEY,xpSecs));
+
+/* ================= Wind / burn check ================= */
+// A new random reading every 30 minutes. It's seeded by the time slot, so every phone
+// shows the same reading at the same time.
+const WIND_SLOT=30*60*1000;
+const BURN=[ // windiest first
+  {text:'Do not burn any trash whatsoever right now', color:'#ff4a3d', lo:26, hi:38},
+  {text:'Absolutely not. The embers will end up in the neighbor’s yard', color:'#ff8a50', lo:18, hi:26},
+  {text:'Small pile only, and keep a hose handy', color:'#f2c14e', lo:11, hi:18},
+  {text:'Go ahead and burn, just keep an eye on it', color:'#a6d96a', lo:5, hi:11},
+  {text:'Light it all on fire, you pussies', color:'#5fbf80', lo:0, hi:5}
+];
+const DIRS=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+function seeded(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function windReading(slot){
+  const r=seeded(Math.imul(slot,2654435761)^0x5bd1e995); r(); r();
+  const lvl=Math.floor(r()*5), b=BURN[lvl];
+  const speed=b.lo+r()*(b.hi-b.lo);
+  const gust=speed+(lvl>=3?r()*4:3+r()*9);
+  const dir=Math.floor(r()*16);
+  return {lvl,b,speed,gust,dir};
+}
+let windSlot=-1, windAngle=0;
+// wind streaks across the sky strip
+(()=>{const sky=$('windSky');for(let i=0;i<14;i++){const s=document.createElement('i');s.style.top=(8+Math.random()*84)+'%';s.style.width=(20+Math.random()*40)+'%';s.dataset.r=Math.random();sky.appendChild(s)}})();
+function windTick(){
+  const now=Date.now(), slot=Math.floor(now/WIND_SLOT);
+  if(slot!==windSlot){
+    windSlot=slot;
+    const w=windReading(slot), card=$('windCard');
+    card.style.setProperty('--lvl',w.b.color);
+    $('burnStatus').textContent=w.b.text;
+    [...$('burnMeter').children].forEach((d,i)=>d.style.background=i<=w.lvl?w.b.color:'');
+    $('windSpeed').textContent=Math.round(w.speed)+' mph';
+    $('windGust').textContent=Math.round(w.gust)+' mph';
+    $('windDir').textContent=DIRS[w.dir];
+    // arrow points where the wind blows to; turn the short way round
+    const target=w.dir*22.5+180; windAngle+=((target-windAngle)%360+540)%360-180;
+    $('windArrow').style.transform=`rotate(${windAngle}deg)`;
+    const secsPerCross=Math.max(.5,6-w.speed/7);
+    $('windSky').querySelectorAll('i').forEach(s=>{
+      const r=+s.dataset.r; s.style.animationDuration=(secsPerCross*(0.7+r*0.6)).toFixed(2)+'s';
+      s.style.animationDelay=(-r*secsPerCross).toFixed(2)+'s';
+      s.style.opacity=w.speed<3?.25:1;
+    });
+    $('windUpdated').textContent='Reading from '+new Date(slot*WIND_SLOT).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+  }
+  const left=Math.ceil(((windSlot+1)*WIND_SLOT-now)/1000);
+  $('windNext').textContent='Next in '+Math.floor(left/60)+':'+String(left%60).padStart(2,'0');
+}
+windTick(); setInterval(windTick,1000);
 
 /* ================= Boot ================= */
 if(navigator.standalone===true) document.documentElement.classList.add('standalone');
