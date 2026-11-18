@@ -970,7 +970,12 @@ $('playlist').addEventListener('click',e=>{
 /* ================= Boot ================= */
 if(navigator.standalone===true) document.documentElement.classList.add('standalone');
 renderM(); renderCounts(); setStage('idle');
-showView(store.get('bbict-tab')||'molkky');
+// First open (in the browser, or the first launch from the home screen) starts on Mölkky.
+// After that, reopen the last tab used.
+const installed=navigator.standalone===true||matchMedia('(display-mode: standalone)').matches;
+const firstInstalledLaunch=installed&&!store.get('bbict-installed-seen');
+if(installed) store.set('bbict-installed-seen',true);
+showView(firstInstalledLaunch?'molkky':(store.get('bbict-tab')||'molkky'));
 if('serviceWorker' in navigator){
   // Reload once when a new version takes over, so updates show without a second launch.
   const hadController=!!navigator.serviceWorker.controller; let reloaded=false;
