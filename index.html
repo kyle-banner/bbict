@@ -364,7 +364,7 @@ label.opt select{font:inherit;font-size:16px;font-weight:400;padding:10px;border
         <div class="xp-stat"><span>Next level in</span><b id="xpEta">—</b></div>
       </div>
     </div>
-    <p class="fine">Level 1 to 60 takes three straight days of looking at this app. It counts on every tab and keeps adding up. Every 5th level comes with a challenge.</p>
+    <p class="fine">Level 1 to 60 takes two straight days of looking at this app. It counts on every tab and keeps adding up. Every 5th level comes with a challenge.</p>
     <div class="lvl-list" id="lvlList"></div>
   </section>
 
@@ -744,8 +744,8 @@ $('again').onclick=()=>{clearInterval(scanTimer);setStage('idle')};
 
 /* ================= BBICT XP ================= */
 // XP needed to go from level n to n+1 (index 0 = level 1 to 2). 4,084,700 XP total to reach 60.
-// Level 60 takes three days (72 hours) of looking at the app.
-const XP_PER_SEC=4084700/(72*3600);
+// Level 60 takes two days (48 hours) of looking at the app.
+const XP_PER_SEC=4084700/(48*3600);
 const LEVELS=[ // [title, challenge or null], index 0 = level 1
   ['Fresh Off the Tailgate',null],
   ['Forgot the Tent Stakes',null],
