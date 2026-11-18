@@ -618,7 +618,22 @@ $('again').onclick=()=>{clearInterval(scanTimer);setStage('idle')};
 if(navigator.standalone===true) document.documentElement.classList.add('standalone');
 renderM(); renderCounts(); setStage('idle');
 showView(store.get('bbict-tab')||'molkky');
-if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+if('serviceWorker' in navigator){
+  // Reload once when a new version takes over, so updates show without a second launch.
+  const hadController=!!navigator.serviceWorker.controller; let reloaded=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(!hadController||reloaded) return;
+    // don't yank the page out from under a scan or an open form
+    if(!$('setup').hidden||!$('scanProgress').hidden&&$('again').hidden) return;
+    reloaded=true; location.reload();
+  });
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{
+      // iOS often resumes the app instead of relaunching it, so check for updates on resume too
+      document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible') reg.update().catch(()=>{})});
+    }).catch(()=>{});
+  });
+}
 </script>
 </body>
 </html>

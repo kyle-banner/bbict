@@ -1,7 +1,11 @@
-// Offline support: everything is cached on first visit and served from the cache.
-// When online, files are refreshed in the background, so updates show up on the next launch.
-// Bump VERSION when you add or rename files.
-const VERSION = 'bbict-v10';
+// Offline support.
+// - The page itself loads network-first (fresh when you have signal, saved copy when you don't
+//   or when the network takes longer than 3 seconds).
+// - Sounds and icons load from the saved copy instantly and refresh in the background.
+// - Every network request skips the browser's HTTP cache, because GitHub Pages lets browsers
+//   reuse files for 10 minutes, which otherwise gets old files saved under a new version.
+// Bump VERSION on every release so phones pick up the new service worker.
+const VERSION = 'bbict-v11';
 const FILES = [
   './',
   'index.html',
@@ -15,7 +19,11 @@ const FILES = [
 ];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
+  e.waitUntil(
+    caches.open(VERSION)
+      .then(c => c.addAll(FILES.map(f => new Request(f, { cache: 'reload' }))))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', e => {
@@ -26,17 +34,37 @@ self.addEventListener('activate', e => {
   );
 });
 
+function fresh(req) {
+  return fetch(req, { cache: 'no-cache' });
+}
+
 self.addEventListener('fetch', e => {
-  if (e.request.method !== 'GET' || new URL(e.request.url).origin !== location.origin) return;
-  e.respondWith(
-    caches.open(VERSION).then(cache =>
-      cache.match(e.request, { ignoreSearch: true }).then(hit => {
-        const net = fetch(e.request).then(res => {
-          if (res && res.ok && res.type === 'basic') cache.put(e.request, res.clone());
-          return res;
-        }).catch(() => hit);
-        return hit || net;
-      })
-    )
-  );
+  const req = e.request;
+  if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
+
+  if (req.mode === 'navigate') {
+    // Page: network first, saved copy as fallback.
+    e.respondWith(caches.open(VERSION).then(cache => {
+      const net = fresh(req).then(res => {
+        if (res && res.ok) cache.put('./', res.clone());
+        return res;
+      });
+      const timeout = new Promise(r => setTimeout(r, 3000));
+      const saved = () => cache.match('./').then(hit => hit || cache.match('index.html'));
+      return Promise.race([net.catch(() => null), timeout.then(() => null)])
+        .then(res => res || saved().then(hit => hit || net));
+    }));
+    return;
+  }
+
+  // Everything else: saved copy first, refresh in the background.
+  e.respondWith(caches.open(VERSION).then(cache =>
+    cache.match(req, { ignoreSearch: true }).then(hit => {
+      const net = fresh(req).then(res => {
+        if (res && res.ok && res.type === 'basic') cache.put(req, res.clone());
+        return res;
+      }).catch(() => hit);
+      return hit || net;
+    })
+  ));
 });
