@@ -5,7 +5,7 @@
 // - Every network request skips the browser's HTTP cache, because GitHub Pages lets browsers
 //   reuse files for 10 minutes, which otherwise gets old files saved under a new version.
 // Bump VERSION on every release so phones pick up the new service worker.
-const VERSION = 'bbict-v22';
+const VERSION = 'bbict-v23';
 const FILES = [
   './',
   'index.html',
@@ -13,6 +13,7 @@ const FILES = [
   'icons/icon-180.png',
   'icons/icon-192.png',
   'icons/icon-512.png',
+  'icons/icon-maskable-512.png',
   'sounds/airhorn.wav',
   'sounds/damn-son.mp3',
   'sounds/chad-alert.mp3'
