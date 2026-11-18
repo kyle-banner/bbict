@@ -134,7 +134,7 @@ label.opt select{font:inherit;font-size:16px;font-weight:400;padding:10px;border
 .banger .ring{position:absolute;right:-30px;top:50%;width:160px;height:160px;margin-top:-80px;border-radius:50%;border:14px solid currentColor;opacity:.12;pointer-events:none}
 .banger.fire .ring{animation:boom .5s ease-out}
 @keyframes boom{0%{transform:scale(.6);opacity:.5}100%{transform:scale(1.6);opacity:0}}
-.banger-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px;color:var(--muted)}
+.banger-foot{display:flex;justify-content:flex-end;align-items:center;gap:12px;font-size:13px;color:var(--muted)}
 
 /* ---------- Newt scanner ---------- */
 .scanner{background:var(--surface);border-radius:20px;overflow:hidden;display:flex;flex-direction:column}
@@ -238,7 +238,6 @@ label.opt select{font:inherit;font-size:16px;font-weight:400;padding:10px;border
       <button class="banger b3" data-sound="sounds/chad-alert.mp3" data-key="chad"><span class="ring"></span><span class="bname">Wild</span><span class="bcount"></span></button>
     </div>
     <div class="banger-foot">
-      <span>Mash as much as you want. Sounds stack.</span>
       <button class="pill" id="stopAll">Stop all</button>
     </div>
   </section>

@@ -1,7 +1,7 @@
 // Offline support: everything is cached on first visit and served from the cache.
 // When online, files are refreshed in the background, so updates show up on the next launch.
 // Bump VERSION when you add or rename files.
-const VERSION = 'bbict-v9';
+const VERSION = 'bbict-v10';
 const FILES = [
   './',
   'index.html',
