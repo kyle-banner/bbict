@@ -62,7 +62,7 @@ h2{font-family:var(--display);font-weight:800;font-size:13px;letter-spacing:.08e
 
 /* Tabs */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-.tabs-in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);height:var(--tabh)}
+.tabs-in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--tabh)}
 .tab{background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--muted);font-size:12px;font-weight:700}
 .tab svg{width:26px;height:26px}
 .tab[aria-selected="true"]{color:var(--fg)}
@@ -160,6 +160,10 @@ label.opt select{font:inherit;font-size:16px;font-weight:400;padding:10px;border
 .shutter:active{background:#fff}
 .camclose{position:absolute;top:10px;right:10px;background:rgba(5,8,6,.6);border:none;color:#fff;border-radius:999px;padding:6px 12px;font-weight:700;font-size:14px}
 .fine{font-size:13px;color:var(--muted);margin:0}
+
+/* ---------- Info ---------- */
+.info-card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:36px 24px;text-align:center}
+.info-card p{margin:0;font-family:var(--display);font-weight:900;font-size:clamp(30px,9vw,42px);line-height:1.12;text-wrap:balance}
 
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.scanline{top:50%}}
 </style>
@@ -274,6 +278,12 @@ label.opt select{font:inherit;font-size:16px;font-weight:400;padding:10px;border
       </div>
     </div>
   </section>
+
+  <!-- ======== Info ======== -->
+  <section class="view" id="v-info" hidden>
+    <h2>Info</h2>
+    <div class="info-card"><p>Friday February 5th at the spot</p></div>
+  </section>
 </main>
 
 <nav class="tabs" role="tablist">
@@ -289,6 +299,10 @@ label.opt select{font:inherit;font-size:16px;font-weight:400;padding:10px;border
     <button class="tab" role="tab" data-view="newt" aria-selected="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M3 12h18"/></svg>
       Newt scan
+    </button>
+    <button class="tab" role="tab" data-view="info" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6"/><circle cx="12" cy="7.5" r=".6" fill="currentColor"/></svg>
+      Info
     </button>
   </div>
 </nav>
@@ -334,7 +348,7 @@ const $=id=>document.getElementById(id);
 const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 
 /* ================= Tabs ================= */
-const TITLES={molkky:'Mölkky',bangers:'Banger alerts',newt:'Newt scan'};
+const TITLES={molkky:'Mölkky',bangers:'Banger alerts',newt:'Newt scan',info:'Info'};
 function showView(name){
   if(!TITLES[name]) name='molkky';
   document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.view===name));
